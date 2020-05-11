@@ -14,5 +14,5 @@ trait Applicative[F[_]] extends Apply[F] {
    * map is now defined. first, we place function into the same context
    * and then apply it to the context.
    */
-  def map[A, B](fa: F[A])(f: A => B): F[B] = ap(pure(f))(fa)
+  def map[A, B](fa: F[A])(f: A => B): F[B] = ap(fa)(pure(f))
 }

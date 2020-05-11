@@ -1,6 +1,6 @@
 package voids.fn
 
-case object FunctorExample {
+object FunctorExample {
 
   /**
    * Functor for Option.
