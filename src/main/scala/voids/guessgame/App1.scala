@@ -4,8 +4,11 @@ import scala.io.StdIn.readLine
 import scala.util.Try
 
 object App1 {
+
+  // Function for parsing integers
   def parseInt(s: String): Option[Int] = Try(s.toInt).toOption
 
+  // PROGRAM
   trait Program[F[_]] {
     def finish[A](a: => A): F[A]
 
@@ -22,6 +25,7 @@ object App1 {
   }
   def finish[F[_], A](a: => A)(implicit F: Program[F]): F[A] = F.finish(a)
 
+  // CONSOLE
   trait Console[F[_]] {
     def putStrLn(line: String): F[Unit]
     def getStrLn: F[String]
@@ -32,6 +36,7 @@ object App1 {
   def putStrLn[F[_]: Console](line: String): F[Unit] = Console[F].putStrLn(line)
   def getStrLn[F[_]: Console]: F[String] = Console[F].getStrLn
 
+  // RANDOM
   trait Random[F[_]] {
     def nextInt(upper: Int): F[Int]
   }
@@ -40,6 +45,7 @@ object App1 {
   }
   def nextInt[F[_]](upper: Int)(implicit F: Random[F]): F[Int] = Random[F].nextInt(upper)
 
+  // IO
   case class IO[A](unsafeRun: () => A) { self =>
     def map[B](f: A => B): IO[B] = IO(() => f(self.unsafeRun()))
 
@@ -55,15 +61,16 @@ object App1 {
 
       def map[A, B](fa: IO[A], ab: A => B): IO[B] = fa.map(ab)
     }
-    implicit val ConsoleIO = new Console[IO] {
+    implicit val ConsoleIO: Console[IO] = new Console[IO] {
       def putStrLn(line: String): IO[Unit] = IO(() => println(line))
       def getStrLn: IO[String] = IO(() => readLine())
     }
-    implicit val RandomIO = new Random[IO] {
+    implicit val RandomIO: Random[IO] = new Random[IO] {
       def nextInt(upper: Int): IO[Int] = IO(() => scala.util.Random.nextInt(upper))
     }
   }
 
+  // TEST
   case class TestData(input: List[String], output: List[String], nums: List[Int]) {
     def putStrLn(line: String): (TestData, Unit) =
       (copy(output = line :: output), ())
@@ -105,6 +112,7 @@ object App1 {
     }
   }
 
+  // GAME
   def checkContinue[F[_]: Program: Console](name: String): F[Boolean] =
     for {
       _     <- putStrLn("Do you want to continue, " + name + "?")
